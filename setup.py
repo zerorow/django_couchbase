@@ -5,7 +5,7 @@ import couchbase
 
 setup(
       name="django-couchbase",
-      version= '0.0.4',
+      version= '0.0.5',
       description="couchbase client for django memcache",
       long_description=open("README").read(),
       author="MaxiL",
