@@ -10,6 +10,7 @@ settings
                                 'bucket': 'bk',
                                 'password': 'password',
                                 'operation_timeout': 20.5,
+                                'gevent_support': False,
                                 
                     # couchbase-cli need admin and password,
                     # but for security issue... be careful to use                    
@@ -70,7 +71,8 @@ class CouchbaseCache(BaseMemcachedCache):
                                      password=self._options.get('password', ''),
                                      port=port,
                                      timeout=self._options.get('operation_timeout', 10 ),
-                                     lockmode=connection.LOCKMODE_WAIT )
+                                     lockmode=connection.LOCKMODE_WAIT, 
+                                     experimental_gevent_support=self._options.get('gevent_support', False ) )
 
         self._client = client
 

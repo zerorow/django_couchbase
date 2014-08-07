@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 from setuptools import setup
-import couchbase
 
 setup(
       name="django-couchbase",
-      version= '0.0.5',
+      version= '0.0.7',
       description="couchbase client for django memcache",
       long_description=open("README").read(),
       author="MaxiL",

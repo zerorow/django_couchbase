@@ -1,5 +1,34 @@
+2014/8/7
+    Add gevent_support flag
+    
+    settings
+        
+        USE_COUCHBASE = True
+        if USE_COUCHBASE:
+            CACHES['default']['BACKEND']= 'django_couchbase.memcached.CouchbaseCache'
+            CACHES['default']['LOCATION'] = ['127.0.0.1:8091']
+            CACHES['default']['OPTIONS'] = {
+                                            'bucket': 'bk',
+                                            'password': 'password',
+                                            'operation_timeout': 20.5,
+                                            'gevent_support': False
+                                            }
 
-103/12/2
+    Couchbase Python Client Library 1.2.2 documentation
+        http://pythonhosted.org/couchbase/api/couchbase.html
+        Gevent_support is a experimental feature, it always make project crash..
+
+2014/8/6
+    Update package requires.
+
+2013/12/12
+    Try add clear(), but always permission error when execute
+    another python script..
+
+2013/12/5
+    add delete(), set_many(), delete_many(), incr(), decr()
+
+2013/12/2
     Couchbase client for django memcache
     basic behavior set() and get()
     
