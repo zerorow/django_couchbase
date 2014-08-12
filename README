@@ -1,3 +1,10 @@
+2014/8/12
+    add test script
+    handle timeout < 0
+
+2014/8/8
+    add get_many()
+    
 2014/8/7
     Add gevent_support flag
     

@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
       name="django-couchbase",
-      version= '0.0.7',
+      version= '0.0.9',
       description="couchbase client for django memcache",
       long_description=open("README").read(),
       author="MaxiL",

@@ -94,12 +94,15 @@ class CouchbaseCache(BaseMemcachedCache):
         cn = self._cache
         rs = None
         
+        cacheTimeout = self._get_memcache_timeout(timeout)        
+        
         try:
             #cn.lock( key,  ttl=self._get_memcache_timeout(timeout) )
-            
-            rs = cn.set(key, value,
-                         ttl=self._get_memcache_timeout(timeout)
-                        )
+            if cacheTimeout < 0:
+                rs = cn.delete(key)
+            else:
+                rs = cn.set(key, value,
+                         ttl=cacheTimeout )
         except exceptions.KeyExistsError,e:
             #pass
             #cn.replace( key, value, ttl=self._get_memcache_timeout(timeout) ) 
@@ -119,8 +122,14 @@ class CouchbaseCache(BaseMemcachedCache):
     def add(self, key, value, timeout=0, version=None):
         key = self.make_key(key, version=version) 
         rs = False
+        
+        cacheTimeout = self._get_memcache_timeout(timeout) 
+        
         try:
-            rs = self._cache.add(key, value, ttl=self._get_memcache_timeout(timeout) )
+            if cacheTimeout > 0:
+                rs = self._cache.add(key, value, ttl=cacheTimeout )
+        except exceptions.KeyExistsError:
+            log.error( 'CouchbaseError: try add exist key "%s"' % key, exc_info=True )
         except Exception, e:
             log.error( 'CouchbaseError: %s' % e, exc_info=True )
         return rs
@@ -160,14 +169,36 @@ class CouchbaseCache(BaseMemcachedCache):
             log.error( 'CouchbaseError: %s' % e, exc_info=True )
         return rs
 
+    def get_many(self, keys, version=None):
+        new_keys = map(lambda x: self.make_key(x, version=version), keys)
+        ret = {}
+        try:
+            ret = self._cache.get_multi(new_keys, ttl=self._get_memcache_timeout(self.default_timeout))
+            for key, result in ret.iteritems():
+                if result.success:
+                    ret[key] = result.value
+        except exceptions.NotFoundError, e:
+            for key, result in e.all_results.iteritems():
+                if result.success:
+                    ret[key] = result.value
+        except Exception, e:
+            log.error('CouchbaseError: %s' % e, exc_info=True)
+        return ret        
+
     def set_many(self, data, timeout=0, version=None):
         safe_data = {}
         for key, value in data.items():
             key = self.make_key(key, version=version)
             safe_data[key] = value
         rs = False    
+        
+        cacheTimeout = self._get_memcache_timeout(timeout)
+        
         try:
-            rs = self._cache.set_multi(safe_data, ttl=self._get_memcache_timeout(timeout))
+            if cacheTimeout < 0:
+                rs = self._cache.delete_multi( safe_data.keys() )
+            else:
+                rs = self._cache.set_multi(safe_data, ttl=cacheTimeout)
         except Exception, e:
             log.error( 'CouchbaseError: %s' % e, exc_info=True )
         return rs
