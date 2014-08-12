@@ -126,7 +126,7 @@ class CouchbaseCache(BaseMemcachedCache):
         cacheTimeout = self._get_memcache_timeout(timeout) 
         
         try:
-            if cacheTimeout > 0:
+            if cacheTimeout >= 0:
                 rs = self._cache.add(key, value, ttl=cacheTimeout )
         except exceptions.KeyExistsError:
             log.error( 'CouchbaseError: try add exist key "%s"' % key, exc_info=True )

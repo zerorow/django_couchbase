@@ -1,7 +1,8 @@
 2014/8/12
     add test script
     handle timeout < 0
-
+    fix add with timeout = 0
+    
 2014/8/8
     add get_many()
     
