@@ -28,13 +28,14 @@ settings
 """
 import logging
 import warnings
+import json, urllib3
 from threading import local
 
 from django.conf import settings
 from django.core.cache.backends.base import InvalidCacheBackendError
 from django.core.cache.backends.memcached import BaseMemcachedCache
 
-from couchbase import Couchbase,connection,exceptions
+from couchbase import *
 
 log = logging.getLogger('django.couchbase')
 
@@ -256,18 +257,16 @@ class CouchbaseCache(BaseMemcachedCache):
                         self._options.get( 'admin-pwd', '' ),
                         self._server[0], self._bucket ) )== 0
         '''
-        import urllib3
+        endpoint = '/pools/default/buckets/%s/controller/doFlush' % self._options.get('bucket', 'default')
+        requestHeaders = urllib3.make_headers(basic_auth=self._options.get('admin:pwd', ''))
         conn = urllib3.connection_from_url(self._server[0], block=True, maxsize=100)
-        endpoint = '/pools/default/buckets/%s/controller/doFlush' % self._bucket
-        res = conn.urlopen(url=endpoint, method='POST', headers=urllib3.make_headers(basic_auth = self._options.get( 'admin:pwd', '' ),))
-
+        res = conn.urlopen(url=endpoint, method='POST', headers=requestHeaders)
         if len(res.data) == 0:
             return True
         else:
+            msg = res.data
             # '{"_":"Flush is disabled for the bucket"}'
-            j = json.loads( res.data )
-            msg = j.get( '-' )
+            try: msg = json.loads(res.data).get('-')
+            except Excetion as e: pass
             log.error( "CouchbaseError: clear fail..: %s" % ( msg ) )
             return False
-            
-            
