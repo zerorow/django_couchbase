@@ -1,4 +1,7 @@
 2014/9/4
+    clear with REST api.
+
+2014/9/4
     add option format: JSON, PICKLE, UTF8, BYTES, AUTO, default is PICKLE
     
     settings
