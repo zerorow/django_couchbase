@@ -12,7 +12,7 @@ setup(
       maintainer="MaxiL",
       maintainer_email="maxil@interserv.com.tw",
       url="",
-      download_url="",
+      download_url="https://github.com/maxi119/django_couchbase",
       packages=["django_couchbase"],
       install_requires=[
       	'couchbase',

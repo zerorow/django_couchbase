@@ -73,6 +73,18 @@ class CouchbaseCache(BaseMemcachedCache):
                                      timeout=self._options.get('operation_timeout', 10 ),
                                      lockmode=connection.LOCKMODE_WAIT, 
                                      experimental_gevent_support=self._options.get('gevent_support', False ) )
+                                     
+        optFormat = self._options.get('format', '' )
+        formatMap={ 'JSON': couchbase.FMT_JSON, 
+                    'PICKLE': couchbase.FMT_PICKLE,
+                    'BYTES': couchbase.FMT_BYTES,
+                    'UTF8': couchbase.FMT_UTF8,
+                    'AUTO': couchbase.FMT_AUTO, 
+                    '': couchbase.FMT_PICKLE }
+        if optFormat not in formatMap:
+            optFormat = ''
+            log.error( "Couchbase: unknown format '%s', use default format PICKLE" %(optFormat) )
+        client.default_format = formatMap[ optFormat ]            
 
         self._client = client
 

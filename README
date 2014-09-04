@@ -1,3 +1,15 @@
+2014/9/4
+    add option format: JSON, PICKLE, UTF8, BYTES, AUTO, default is PICKLE
+    
+    settings
+        CACHES['default']['OPTIONS'] = {
+                                        'bucket': 'bk',
+                                        'password': 'password',
+                                        'operation_timeout': 20.5,
+                                        'gevent_support': False,
+                                        'format': 'PICKLE'
+                                        }    
+
 2014/8/12
     add test script
     handle timeout < 0
