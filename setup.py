@@ -16,6 +16,7 @@ setup(
       packages=["django_couchbase"],
       install_requires=[
       	'couchbase',
+      	'urllib3'
       ],
       classifiers=[
         "Development Status :: 1 - Planning",

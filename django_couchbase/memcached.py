@@ -11,12 +11,15 @@ settings
                                 'password': 'password',
                                 'operation_timeout': 20.5,
                                 'gevent_support': False,
+                                'format': 'PICKLE',
+                                'admin:pwd': 'admin:pwd'
                                 
                     # couchbase-cli need admin and password,
                     # but for security issue... be careful to use                    
-                                'couchbase-cli': '/opt/couchbase/bin/python',
-                                'admin': 'admin',
-                                'admin-pwd': 'pwd'
+                    #            'couchbase-cli': '/opt/couchbase/bin/python',
+                    #            'admin': 'admin',
+                    #            'admin-pwd': 'pwd'
+                    
                                 }
                  }
           }
@@ -238,7 +241,6 @@ class CouchbaseCache(BaseMemcachedCache):
            execute:
              > python couchbase-cli bucket-flush -u admin -p password -c 192.168.12.13:8091 -b bucket --force
 
-        '''
         import os,os.path
         #if self._couchbase_cli == '':
         if True:
@@ -253,5 +255,19 @@ class CouchbaseCache(BaseMemcachedCache):
                         self._options.get( 'admin','' ),
                         self._options.get( 'admin-pwd', '' ),
                         self._server[0], self._bucket ) )== 0
+        '''
+        import urllib3
+        conn = urllib3.connection_from_url(self._server[0], block=True, maxsize=100)
+        endpoint = '/pools/default/buckets/%s/controller/doFlush' % self._bucket
+        res = conn.urlopen(url=endpoint, method='POST', headers=urllib3.make_headers(basic_auth = self._options.get( 'admin:pwd', '' ),))
 
-        
+        if len(res.data) == 0:
+            return True
+        else:
+            # '{"_":"Flush is disabled for the bucket"}'
+            j = json.loads( res.data )
+            msg = j.get( '-' )
+            log.error( "CouchbaseError: clear fail..: %s" % ( msg ) )
+            return False
+            
+            
